@@ -1,9 +1,9 @@
-<script src="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.14/cartodb.js"></script>
+<script src="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/cartodb.js"></script>
 
 <dom-module id="vis-app">
   <template>
     <style>
-      #vismap {
+      #map {
         margin: 0;
         height: 90vh;
       }
@@ -15,27 +15,29 @@
         right: 10px;
         z-index: 2;
       }
+      .iron-selected {
+        background: #303a9f;
+        color: white;
+      }
     </style>
     <paper-card>
       <div class="card-content" style="padding-top: 0px">
         <h4>Type: {{type}}</h4>
         <h4>Hour: {{hour}}</h4>
         <paper-input required id="hourinput" label="hour of the day"></paper-input>
-        <paper-dropdown-menu required label="type" id="typedropdown">
-          <paper-listbox class="dropdown-content">
-            <paper-item>pickup_count</paper-item>
-            <paper-item>passenger_count</paper-item>
-            <paper-item>trip_distance</paper-item>
-            <paper-item>tip_amount</paper-item>
-            <paper-item>tolls_amount</paper-item>
-          </paper-listbox>
-        </paper-dropdown-menu>
+        <iron-selector attr-for-selected="name" id="typeselector" selected="trip_distance">
+          <paper-item name="pickup_count">pickup_count</paper-item>
+          <paper-item name="passenger_count">passenger_count</paper-item>
+          <paper-item name="trip_distance">trip_distance</paper-item>
+          <paper-item name="tip_amount">tip_amount</paper-item>
+          <paper-item name="tolls_amount">tolls_amount</paper-item>
+        </iron-selector>
       </div>
       <div class="card-actions">
         <paper-button on-click="getMap" raised style="background:#303a9f;color: white">Search</paper-button>
       </div>
     </paper-card>
-    <div id="vismap"></div>
+    <div id="map"></div>
   </template>
 </dom-module>
 <script>
@@ -68,7 +70,7 @@
       },
       renderCartodb: function () {
         var _this = this;
-        cartodb.createVis(_this.$$("#vismap"), 'https://wstcpyt.cartodb.com/api/v2/viz/8557d70c-fb66-11e5-bbc2-0e674067d321/viz.json',{https: true})
+        cartodb.createVis(_this.$$("#map"), 'https://wstcpyt.cartodb.com/api/v2/viz/8557d70c-fb66-11e5-bbc2-0e674067d321/viz.json',{https: true})
           .done(function (vis, layers) {
             layers[1].getSubLayer(0).setSQL("SELECT * FROM pickup_2015_12_yellowtaxi_full_geoinfo WHERE hour=6");
             _this.curlayer = layers[1].getSubLayer(0)
@@ -76,10 +78,10 @@
       },
       getMap: function () {
         var hourvalidate = this.$$("#hourinput").validate();
-        var maptypevalidate = this.$$("#typedropdown").validate();
-        if (hourvalidate && maptypevalidate) {
+        if (hourvalidate) {
           var hour = this.$$("#hourinput").value;
-          var maptype = this.$$("#typedropdown").selectedItemLabel;
+          var maptype = this.$$("#typeselector").selectedItem.innerHTML.replace(/^\s+|\s+$/g, '');
+          console.log(maptype)
           this.hour = hour;
           this.type = maptype;
           var sqlstatement = "SELECT * FROM pickup_2015_12_yellowtaxi_full_geoinfo WHERE hour=" + hour
