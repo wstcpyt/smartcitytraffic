@@ -3,7 +3,7 @@
 <dom-module id="vis-app">
   <template>
     <style>
-      #map {
+      #vismap {
         margin: 0;
         height: 90vh;
       }
@@ -35,7 +35,7 @@
         <paper-button on-click="getMap" raised style="background:#303a9f;color: white">Search</paper-button>
       </div>
     </paper-card>
-    <div id="map"></div>
+    <div id="vismap"></div>
   </template>
 </dom-module>
 <script>
@@ -68,7 +68,7 @@
       },
       renderCartodb: function () {
         var _this = this;
-        cartodb.createVis(_this.$$("#map"), 'https://wstcpyt.cartodb.com/api/v2/viz/8557d70c-fb66-11e5-bbc2-0e674067d321/viz.json',{https: true})
+        cartodb.createVis(_this.$$("#vismap"), 'https://wstcpyt.cartodb.com/api/v2/viz/8557d70c-fb66-11e5-bbc2-0e674067d321/viz.json',{https: true})
           .done(function (vis, layers) {
             layers[1].getSubLayer(0).setSQL("SELECT * FROM pickup_2015_12_yellowtaxi_full_geoinfo WHERE hour=6");
             _this.curlayer = layers[1].getSubLayer(0)

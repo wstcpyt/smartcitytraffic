@@ -56,6 +56,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <!-- For shared styles, shared-styles.html import in elements.html -->
   <style is="custom-style" include="shared-styles"></style>
+  <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css"/>
+
 </head>
 
 <body unresolved>
@@ -194,6 +196,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       if (taxipredictnode==undefined){
         var node = document.createElement("taxi-predict");
         document.getElementById("taxisection").appendChild(node);
+      }
+    });
+    document.getElementById("airlineroute").addEventListener("click", function () {
+      var taxipredictnode = document.querySelector("vis-app");
+      if (taxipredictnode==undefined){
+        var node = document.createElement("vis-app");
+        document.getElementById("airlinesection").appendChild(node);
       }
     });
   })
