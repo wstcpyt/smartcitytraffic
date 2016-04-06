@@ -33,7 +33,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     function setFocus(selected){
-      document.querySelector('section[data-route="' + selected + '"] .page-title').focus();
+      var focuselement = document.querySelector('section[data-route="' + selected + '"] .page-title');
+      if (focuselement){
+        focuselement.focus();
+      }
     }
 
     // Routes
@@ -51,22 +54,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       setFocus(app.route);
     });
 
-    page('/users', function() {
-      app.route = 'users';
+    page('/mapvis', function() {
+      app.route = 'mapvis';
       setFocus(app.route);
     });
 
-    page('/users/:name', function(data) {
-      app.route = 'user-info';
-      app.params = data.params;
+    page('/taxi', function() {
+      app.route = 'taxi';
       setFocus(app.route);
     });
 
-    page('/contact', function() {
-      app.route = 'contact';
+    page('/analysis', function() {
+      app.route = 'analysis';
       setFocus(app.route);
     });
-
+    page('/taxitime', function() {
+      app.route = 'taxitime';
+      setFocus(app.route);
+    });
+    page('/documentation', function() {
+      app.route = 'documentation';
+      setFocus(app.route);
+    });
     // 404
     page('*', function() {
       app.$.toast.text = 'Can\'t find: ' + window.location.href  + '. Redirected you to Home Page';
