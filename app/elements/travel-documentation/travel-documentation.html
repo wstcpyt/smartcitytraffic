@@ -1,0 +1,74 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="travel-documentation">
+  <template>
+    <style>
+      #newspanel {
+        @apply(--layout-vertical);
+        @apply(--layout-wrap);
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+      }
+
+      #newspanel > paper-card {
+        box-sizing: border-box;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 20px;
+        flex: 0 0 auto;
+      }
+
+      .card-header {
+        @apply(--paper-font-headline);
+        margin-left: 10px;;
+      }
+    </style>
+    <div id="newspanel">
+        <paper-card>
+          <img width="300" src="http://www.davidbakertaxis.com/images/Slider01.jpg">
+          <a href="https://taxitrip.firebaseapp.com/index.html">
+            <div class="card-header">Taxi Documentation</div>
+          </a>
+
+        </paper-card>
+      <paper-card>
+        <img width="300" src="http://i.investopedia.com/inv/articles/slideshow/coolest-airlines/airline-coolest.jpg?quality=80&width=680&height=680">
+          <div class="card-header">Flight Documentation</div>
+        <div class="card-content">
+          <div>
+            <a href="https://spotifyairlinemap.firebaseapp.com/airlinespark.html">
+              The Spark (Scala version) notebook
+            </a>
+          </div>
+          <div>
+            <a href="https://spotifyairlinemap.firebaseapp.com/Airline.html">
+              The Spark (Python version) notebook
+            </a>
+          </div>
+        </div>
+      </paper-card>
+    </div>
+
+  </template>
+
+</dom-module>
+
+<script>
+
+  Polymer({
+    is: 'travel-documentation',
+  });
+
+</script>

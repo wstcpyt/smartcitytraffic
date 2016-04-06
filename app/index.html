@@ -140,6 +140,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <section data-route="taxitime" tabindex="-1" id="taxitimesection">
           </section>
           <section data-route="documentation" tabindex="-1">
+            <div style="max-width: 500px;margin-left: auto;margin-right: auto">
+              <h2 style="font-weight: 300">Documentation</h2>
+              <travel-documentation></travel-documentation>
+            </div>
           </section>
         </iron-pages>
       </div>
@@ -182,6 +186,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       if (taxipredictnode==undefined){
         var node = document.createElement("taxi-visulization");
         document.getElementById("mapvissection").appendChild(node);
+      }
+    });
+    document.getElementById("taxiroute").addEventListener("click", function () {
+      var taxipredictnode = document.querySelector("taxi-predict");
+      if (taxipredictnode==undefined){
+        var node = document.createElement("taxi-predict");
+        document.getElementById("taxisection").appendChild(node);
       }
     });
   })
