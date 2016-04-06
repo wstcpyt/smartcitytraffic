@@ -1,0 +1,103 @@
+<script src="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.14/cartodb.js"></script>
+
+<dom-module id="vis-app">
+  <template>
+    <style>
+      #map {
+        margin: 0;
+        height: 90vh;
+      }
+
+      paper-card {
+        position: absolute;
+        width: 260px;
+        top: 20px;
+        right: 10px;
+        z-index: 2;
+      }
+    </style>
+    <paper-card>
+      <div class="card-content" style="padding-top: 0px">
+        <h4>Type: {{type}}</h4>
+        <h4>Hour: {{hour}}</h4>
+        <paper-input required id="hourinput" label="hour of the day"></paper-input>
+        <paper-dropdown-menu required label="type" id="typedropdown">
+          <paper-listbox class="dropdown-content">
+            <paper-item>pickup_count</paper-item>
+            <paper-item>passenger_count</paper-item>
+            <paper-item>trip_distance</paper-item>
+            <paper-item>tip_amount</paper-item>
+            <paper-item>tolls_amount</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
+      <div class="card-actions">
+        <paper-button on-click="getMap" raised style="background:#303a9f;color: white">Search</paper-button>
+      </div>
+    </paper-card>
+    <div id="map"></div>
+  </template>
+</dom-module>
+<script>
+  (function () {
+    'use strict';
+    Polymer({
+      is: "vis-app",
+      properties:{
+        hour:{
+          type: String,
+          value: "12"
+        },
+        type:{
+          type: String,
+          value: "trip_distance"
+        }
+      },
+      ready: function () {
+        this.passengercnt_css = "#pickup_2015_12_yellowtaxi_full_geoinfo [ passenger_count <= 6] {polygon-fill: #B10026;}#pickup_2015_12_yellowtaxi_full_geoinfo [ passenger_count <= 1.78947368421] {polygon-fill: #E31A1C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ passenger_count <= 1.70962812395] {polygon-fill: #FC4E2A;}#pickup_2015_12_yellowtaxi_full_geoinfo [ passenger_count <= 1.67503736921] {polygon-fill: #FD8D3C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ passenger_count <= 1.63235294118] {polygon-fill: #FEB24C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ passenger_count <= 1.58097165992] {polygon-fill: #FED976;}#pickup_2015_12_yellowtaxi_full_geoinfo [ passenger_count <= 1.47843137255] {polygon-fill: #FFFFB2;}";
+        this.pickupcnt_css = "#pickup_2015_12_yellowtaxi_full_geoinfo [ pickupcnt <= 169037] {polygon-fill: #B10026;}#pickup_2015_12_yellowtaxi_full_geoinfo [ pickupcnt <= 45311] {polygon-fill: #E31A1C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ pickupcnt <= 12115] {polygon-fill: #FC4E2A;}#pickup_2015_12_yellowtaxi_full_geoinfo [ pickupcnt <= 3052] {polygon-fill: #FD8D3C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ pickupcnt <= 1247] {polygon-fill: #FEB24C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ pickupcnt <= 342] {polygon-fill: #FED976;}#pickup_2015_12_yellowtaxi_full_geoinfo [ pickupcnt <= 113] {polygon-fill: #FFFFB2;}";
+        this.distance_css =  "#pickup_2015_12_yellowtaxi_full_geoinfo [ trip_distance <= 781.706423903] {polygon-fill: #B10026;}#pickup_2015_12_yellowtaxi_full_geoinfo [ trip_distance <= 6.87] {polygon-fill: #E31A1C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ trip_distance <= 4.67220720721] {polygon-fill: #FC4E2A;}#pickup_2015_12_yellowtaxi_full_geoinfo [ trip_distance <= 3.87642857143] {polygon-fill: #FD8D3C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ trip_distance <= 3.36548051085] {polygon-fill: #FEB24C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ trip_distance <= 2.93619256018] {polygon-fill: #FED976;}#pickup_2015_12_yellowtaxi_full_geoinfo [ trip_distance <= 2.38925796118] {polygon-fill: #FFFFB2;}";
+        this.tipamount_css = "#pickup_2015_12_yellowtaxi_full_geoinfo [ tip_amount <= 207.5] {polygon-fill: #B10026;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tip_amount <= 3.68458333333] {polygon-fill: #E31A1C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tip_amount <= 2.1702] {polygon-fill: #FC4E2A;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tip_amount <= 1.7506993007] {polygon-fill: #FD8D3C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tip_amount <= 1.5515408805] {polygon-fill: #FEB24C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tip_amount <= 1.33938511327] {polygon-fill: #FED976;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tip_amount <= 0.954677419355] {polygon-fill: #FFFFB2;}"
+        this.tolls_amount_css = "#pickup_2015_12_yellowtaxi_full_geoinfo [ tolls_amount <= 17.33] {polygon-fill: #B10026;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tolls_amount <= 1.84666666667] {polygon-fill: #E31A1C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tolls_amount <= 0.737405857741] {polygon-fill: #FC4E2A;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tolls_amount <= 0.39014084507] {polygon-fill: #FD8D3C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tolls_amount <= 0.235155688623] {polygon-fill: #FEB24C;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tolls_amount <= 0.150005038291] {polygon-fill: #FED976;}#pickup_2015_12_yellowtaxi_full_geoinfo [ tolls_amount <= 0.0841322782689] {polygon-fill: #FFFFB2;}"
+      },
+      attached: function () {
+        var _this = this;
+        setTimeout(function () {
+          _this.renderCartodb();
+        }, 1000); //wait ten seconds before continuing
+      },
+      renderCartodb: function () {
+        var _this = this;
+        cartodb.createVis(_this.$$("#map"), 'https://wstcpyt.cartodb.com/api/v2/viz/8557d70c-fb66-11e5-bbc2-0e674067d321/viz.json',{https: true})
+          .done(function (vis, layers) {
+            layers[1].getSubLayer(0).setSQL("SELECT * FROM pickup_2015_12_yellowtaxi_full_geoinfo WHERE hour=6");
+            _this.curlayer = layers[1].getSubLayer(0)
+          })
+      },
+      getMap: function () {
+        var hourvalidate = this.$$("#hourinput").validate();
+        var maptypevalidate = this.$$("#typedropdown").validate();
+        if (hourvalidate && maptypevalidate) {
+          var hour = this.$$("#hourinput").value;
+          var maptype = this.$$("#typedropdown").selectedItemLabel;
+          this.hour = hour;
+          this.type = maptype;
+          var sqlstatement = "SELECT * FROM pickup_2015_12_yellowtaxi_full_geoinfo WHERE hour=" + hour
+          this.curlayer.setSQL(sqlstatement);
+          if (maptype=="pickup_count"){
+            this.curlayer.setCartoCSS(this.pickupcnt_css)
+          }else if (maptype=="passenger_count"){
+            this.curlayer.setCartoCSS(this.passengercnt_css)
+          }else if (maptype=="trip_distance"){
+            this.curlayer.setCartoCSS(this.distance_css)
+          }else if (maptype=="tip_amount"){
+            this.curlayer.setCartoCSS(this.tipamount_css)
+          }else if (maptype=="tolls_amount"){
+            this.curlayer.setCartoCSS(this.tolls_amount_css)
+          }
+        }
+
+      }
+    })
+  })();
+</script>
