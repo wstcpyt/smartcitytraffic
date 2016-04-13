@@ -1,0 +1,195 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="predict-density">
+  <style>
+    .inputform {
+      width: inherit;
+    }
+  </style>
+  <template>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Predict Pickup density</h4>
+          </div>
+          <div class="modal-body">
+            <div id="densityvis" style="margin-left: auto;margin-right: auto">
+              <paper-card>
+                <img style="height: 300px" src="../../images/real_density.png">
+                <p>Real Pickup Density</p>
+              </paper-card>
+              <paper-card>
+                <img style="height: 300px" src="../../images/predict_density.png">
+                <p>Predicted Pickup Density</p>
+              </paper-card>
+            </div>          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="predictdialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Customize your own prediction</h4>
+          </div>
+          <div class="modal-body">
+            <paper-input id="date" error-message="needs some text!" required label="Date: format(2016-04-12)"></paper-input>
+            <paper-input id="hour" error-message="needs some text!" required label="Hour of the day"></paper-input>
+            <paper-input id="prcp" error-message="needs some text!" required label="Precipitation (inches)"></paper-input>
+            <paper-input id="snow" error-message="needs some text!" required label="Snow (inches)"></paper-input>
+            <paper-input id="tmax" error-message="needs some text!" required label="TMAX (F)"></paper-input>
+            <paper-input id="tmin" error-message="needs some text!" required label="TMIN (F)"></paper-input>
+          </div>
+          <div class="modal-footer">
+            <paper-button on-click="getDensity" dialog-confirm autofocus>Predict</paper-button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="mapdialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Map visulization</h4>
+          </div>
+          <google-map style="width: 500px; height: 500px" latitude="40.77" longitude="-73.86" fit-to-markers>
+            <template is="dom-repeat" items="{{marker}}">
+              <google-map-marker latitude="{{item.lat}}" longitude="{{item.lng}}"></google-map-marker>
+            </template>
+          </google-map>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container">
+      <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="visClicked" data-toggle="modal" data-target="#myModal">Visulization</paper-button>
+      <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="openDialog" data-toggle="modal" data-target="#predictdialog" raised>New Predict</paper-button>
+      <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="analyzeClicked" data-toggle="modal" data-target="#mapdialog">Analyze</paper-button>
+      <div class="row">
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-10">
+          <vaadin-grid style="margin-top: 20px" selection-mode="multi">
+            <table>
+              <colgroup>
+                <col>
+                <col>
+                <col>
+              </colgroup>
+              <thead>
+              <tr>
+                <th>Address</th>
+                <th>LatLng</th>
+                <th>Value</th>
+              </tr>
+              </thead>
+            </table>
+          </vaadin-grid>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+    (function () {
+      'use strict';
+      Polymer({
+        is: 'predict-density',
+        getDensity: function () {
+          var _this = this;
+          var datevalidate = this.$$("#date").validate();
+          var hourvalidate = this.$$("#hour").validate();
+          var prcpv = this.$$("#prcp").validate();
+          var snowv = this.$$("#snow").validate();
+          var tmaxv = this.$$("#tmax").validate();
+          var tminv = this.$$("#tmin").validate();
+          if (datevalidate && hourvalidate && prcpv && snowv && tmaxv && tminv) {
+            var hour = this.$$("#hour").value;
+            var date = this.$$("#date").value;
+            var prcp = this.$$("#prcp").value;
+            var snow = this.$$("#snow").value;
+            var tmax = this.$$("#tmax").value;
+            var tmin = this.$$("#tmin").value;
+            $.ajax({
+                method: "PUT",
+                data: {hour: hour,date:date,prcp:prcp,snow:snow,tmax:tmax,tmin:tmin},
+                url: "https://traveladvisor.herokuapp.com/densitypredict"
+              })
+              .done(function (data) {
+                var griddata = [];
+                var topdensityarray = data['top10'];
+                var top10address = data['top10address'];
+                for (var i = 0; i < topdensityarray.length; i++) {
+                  var latlogstr = topdensityarray[i][1].toString();
+                  griddata.push([top10address[i], latlogstr, parseInt(topdensityarray[i][0])])
+                }
+                _this.griddata = griddata
+                _this.grid.items = function (params, callback) {
+                  callback(griddata.slice(params.index, params.index + params.count));
+                };
+                _this.grid.size = griddata.length;
+              });
+          }
+        },
+        ready: function () {
+          this.marker = []
+          var _this = this;
+          _this.griddata = [];
+          this.grid = this.$$("vaadin-grid");
+          $.ajax({
+              method: "PUT",
+              data: {hour: 12,date:"2016-04-12",prcp:0.1,snow:0,tmax:57,tmin:36},
+              url: "https://traveladvisor.herokuapp.com/densitypredict"
+            })
+            .done(function (data) {
+              var griddata = [];
+              var topdensityarray = data['top10'];
+              var top10address = data['top10address'];
+              for (var i = 0; i < topdensityarray.length; i++) {
+                var latlogstr = topdensityarray[i][1].toString();
+                griddata.push([top10address[i], latlogstr, parseInt(topdensityarray[i][0])])
+              }
+              _this.griddata = griddata;
+              _this.grid.items = function (params, callback) {
+                callback(griddata.slice(params.index, params.index + params.count));
+              };
+              _this.grid.size = 10;
+            });
+        },
+        analyzeClicked: function () {
+          var _this = this;
+          var marker = []
+          this.grid.selection.selected(function (index) {
+            var ltuple = _this.griddata[index][1].split(",")
+            marker.push({lat:ltuple[0],lng:ltuple[1]})
+          })
+          _this.marker = marker
+        },
+        visClicked: function () {
+        }
+      });
+    })();
+  </script>
+</dom-module>

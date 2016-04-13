@@ -53,10 +53,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- Because this project uses vulcanize this should be your only html import
        in this file. All other imports should go in elements.html -->
   <link rel="import" href="elements/elements.html">
-  <link rel="stylesheet" href="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+  <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css"/>
 
   <!-- For shared styles, shared-styles.html import in elements.html -->
   <style is="custom-style" include="shared-styles"></style>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
 </head>
 
@@ -88,10 +92,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <span>Map Visulization</span>
         </a>
 
-        <a data-route="taxi" href="{{baseUrl}}taxi" id="taxiroute">
-          <iron-icon icon="maps:local-taxi"></iron-icon>
-          <span>Predict Trip</span>
-        </a>
         <a data-route="taxitime" href="{{baseUrl}}taxitime" id="taxitimeroute">
           <iron-icon icon="alarm"></iron-icon>
           <span>Taxi Time Lapse</span>
@@ -100,6 +100,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <a data-route="analysis" href="{{baseUrl}}analysis" id="airlineroute">
           <iron-icon icon="donut-small"></iron-icon>
           <span>Trip Analysis</span>
+        </a>
+        <a data-route="taxi" href="{{baseUrl}}taxi" id="taxiroute">
+          <iron-icon icon="maps:local-taxi"></iron-icon>
+          <span>Predict Trip Duration</span>
+        </a>
+        <a data-route="predictdensity" href="{{baseUrl}}predictdensity">
+          <iron-icon icon="group-work"></iron-icon>
+          <span>Predict Pickup Density</span>
         </a>
 
         <a data-route="airline" href="{{baseUrl}}documentation">
@@ -115,7 +123,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-toolbar id="mainToolbar">
         <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
 
-        <!-- Application name -->
         <div class="middle middle-container">
           <div class="app-name">Travel Advisor</div>
         </div>
@@ -127,20 +134,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-pages attr-for-selected="data-route" selected="{{route}}">
           <section data-route="home" tabindex="-1">
             <landing-page></landing-page>
-            <div style="width: 160px;margin-left: auto;margin-right: auto; margin-top: 30px">
-              <paper-button paper-drawer-toggle style="background: #303a9f; color: white" raised>Get Started</paper-button>
-            </div>
           </section>
+
           <section data-route="mapvis" tabindex="-1" id="mapvissection">
           </section>
+
           <section data-route="user-info" tabindex="-1">
+            <paper-material elevation="-1">
+              <h1 class="page-title" tabindex="-1">User: {{params.name}}</h1>
+              <div>This is {{params.name}}'s section</div>
+            </paper-material>
           </section>
+
           <section data-route="taxi" tabindex="-1" id="taxisection">
           </section>
+
           <section data-route="analysis" tabindex="-1" id="airlinesection">
           </section>
           <section data-route="taxitime" tabindex="-1" id="taxitimesection">
             <taxi-time></taxi-time>
+          </section>
+          <section data-route="predictdensity" tabindex="-1">
+            <predict-density></predict-density>
           </section>
           <section data-route="documentation" tabindex="-1">
             <div style="max-width: 500px;margin-left: auto;margin-right: auto">
@@ -198,6 +213,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         document.getElementById("taxisection").appendChild(node);
       }
     });
+
     document.getElementById("airlineroute").addEventListener("click", function () {
       var taxipredictnode = document.querySelector("vis-app");
       if (taxipredictnode==undefined){
@@ -205,6 +221,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         document.getElementById("airlinesection").appendChild(node);
       }
     });
+    document.querySelector("landing-page").addEventListener("getstartedclicked",function () {
+      document.querySelector("paper-drawer-panel").togglePanel()
+    })
+
   })
 </script>
 </body>
