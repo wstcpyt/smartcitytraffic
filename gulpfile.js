@@ -120,6 +120,7 @@ gulp.task('images', function() {
   return imageOptimizeTask('app/images/**/*', dist('images'));
 });
 
+
 // Copy all files at the root level (app)
 gulp.task('copy', function() {
   var app = gulp.src([
@@ -271,7 +272,7 @@ gulp.task('default', ['clean'], function(cb) {
   // Uncomment 'cache-config' if you are going to use service workers.
   runSequence(
     ['ensureFiles', 'copy', 'styles'],
-    ['images', 'fonts', 'html'],
+    ['images','fonts', 'html'],
     'vulcanize', // 'cache-config',
     cb);
 });
