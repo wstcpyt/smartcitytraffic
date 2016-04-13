@@ -47,7 +47,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Customize your own prediction</h4>
+            <h4 class="modal-title">Customize your own prediction</h4>
           </div>
           <div class="modal-body">
             <paper-input id="date" error-message="needs some text!" required label="Date: format(2016-04-12)"></paper-input>
@@ -58,7 +58,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-input id="tmin" error-message="needs some text!" required label="TMIN (F)"></paper-input>
           </div>
           <div class="modal-footer">
-            <paper-button on-click="getDensity" dialog-confirm autofocus>Predict</paper-button>
+            <paper-button data-dismiss="modal"  on-click="getDensity" dialog-confirm autofocus>Predict</paper-button>
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
         </div>
@@ -69,7 +69,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Map visulization</h4>
+            <h4 class="modal-title" >Map visulization</h4>
           </div>
           <google-map style="width: 500px; height: 500px" latitude="40.77" longitude="-73.86" fit-to-markers>
             <template is="dom-repeat" items="{{marker}}">
@@ -180,12 +180,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         analyzeClicked: function () {
           var _this = this;
-          var marker = []
+          var marker = [];
           this.grid.selection.selected(function (index) {
-            var ltuple = _this.griddata[index][1].split(",")
+            var ltuple = _this.griddata[index][1].split(",");
             marker.push({lat:ltuple[0],lng:ltuple[1]})
-          })
-          _this.marker = marker
+          });
+          _this.marker = marker;
+          setTimeout(function () {
+            _this.$$("google-map").resize()
+          }, 500); //wait ten seconds before continuing
         },
         visClicked: function () {
         }
