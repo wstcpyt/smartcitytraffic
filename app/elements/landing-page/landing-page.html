@@ -66,12 +66,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         text-transform: uppercase;
         font-weight: 600;
       }
+      #landimage{
+        width: 1000px;
+        float: right;
+      }
+      @media (min-width: 992px) {
+        #landimage{
+          margin: 0;
+          width: 100%;
+          overflow: hidden;
+        }
+      }
     </style>
-    <img src="../../images/nyctaximap.png">
+    <div class="container">
+
+    </div>
+    <img id="landimage" src="../../images/nyctaximap.png">
     <div class="headtitle container">
       <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-5">
+        <div class="col-md-1 col-sm-1"></div>
+        <div class="col-md-5 col-sm-6">
           <div class="subcaption">Understanding New York City Traffic</div>
           <div class="caption">Plan and Predict your Business Powered By 1 billion Taxi Trip</div>
           <paper-button on-click="getstartClicked" style="background: white;color: black;margin-top: 30px"> Get Started</paper-button>
