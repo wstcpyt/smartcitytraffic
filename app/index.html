@@ -201,21 +201,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <script>
   var app = document.querySelector("#app");
   app.addEventListener("dom-change",function () {
-    document.getElementById("taxiroute").addEventListener("click", function () {
-      var taxipredictnode = document.querySelector("taxi-predict");
-      if (taxipredictnode==undefined){
-        var node = document.createElement("taxi-predict");
-        document.getElementById("taxisection").appendChild(node);
-      }
-    });
-
-    document.getElementById("airlineroute").addEventListener("click", function () {
-      var taxipredictnode = document.querySelector("vis-app");
-      if (taxipredictnode==undefined){
-        var node = document.createElement("vis-app");
-        document.getElementById("airlinesection").appendChild(node);
-      }
-    });
     document.querySelector("landing-page").addEventListener("getstartedclicked",function () {
       document.querySelector("paper-drawer-panel").togglePanel()
     })

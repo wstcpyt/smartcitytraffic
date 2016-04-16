@@ -61,11 +61,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     page('/taxi', function() {
       app.route = 'taxi';
+      var taxipredictnode = document.querySelector("taxi-predict");
+      if (taxipredictnode==undefined){
+        var node = document.createElement("taxi-predict");
+        document.getElementById("taxisection").appendChild(node);
+      }
       setFocus(app.route);
     });
 
     page('/analysis', function() {
       app.route = 'analysis';
+      var taxipredictnode = document.querySelector("vis-app");
+      if (taxipredictnode==undefined){
+        var node = document.createElement("vis-app");
+        document.getElementById("airlinesection").appendChild(node);
+      }
       setFocus(app.route);
     });
     page('/taxitime', function() {
