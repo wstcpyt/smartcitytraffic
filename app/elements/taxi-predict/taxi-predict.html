@@ -139,13 +139,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       Polymer({
         is: 'taxi-predict',
-        behaviors: [
-          Polymer.IronResizableBehavior
-        ],
-
-        listeners: {
-          'iron-resize': 'resize'
-        },
         _mapApiLoaded: function () {
           google.charts.load('current', {packages: ['corechart', 'line']});
           google.charts.setOnLoadCallback(drawBasic);
@@ -307,13 +300,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             chart.draw(data, options);
           }
-        },
-        resize: function () {
-        },
-        resizeMap: function () {
-          setTimeout(function () {
-            google.maps.event.trigger(this.map, 'resize');
-          }, 1000) //wait ten seconds before continuing
         }
     });
     })();
