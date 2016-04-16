@@ -70,11 +70,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         width: 1000px;
         float: right;
       }
+      google-youtube{
+        width:375px;
+        height: auto;
+      }
+      footer{
+        width:100%;
+        min-height:60px;
+        background-color: #222; /* This color gets inverted color or you can add navbar inverse class in html */
+      }
       @media (min-width: 992px) {
         #landimage{
           margin: 0;
           width: 100%;
           overflow: hidden;
+        }
+        google-youtube{
+          width: 1000px;
+          height: auto;
         }
       }
     </style>
@@ -157,6 +170,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </div>
     </section>
+    <section style="background-color: rgb(249,249,249)">
+        <div class="container">
+          <h3 class="text-center">Video</h3>
+          <h2 class="text-center">A quick introduction to smart city traffic</h2>
+          <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+              <p class="text-center">
+                Experience with the user interface
+              </p>
+            </div>
+          </div>7
+          <div style="width: 480px;margin-left: auto;margin-right: auto;margin-bottom: 50px">
+            <google-youtube
+              video-id="P8sDETqx9oY"
+              rel="0"
+              start="5">
+            </google-youtube>
+          </div>
+        </div>
+    </section>
+    <footer class="footer">
+      <div class="container">
+        <div style="color: whitesmoke;margin-top: 10px;text-align: center">Created by Yutong Pang</div>
+      </div>
+    </footer>
   </template>
 
   <script>

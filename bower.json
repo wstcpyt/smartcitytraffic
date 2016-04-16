@@ -13,7 +13,8 @@
     "paper-input": "PolymerElements/paper-input#^1.1.10",
     "google-chart": "GoogleWebComponents/google-chart#^1.0.0",
     "paper-card": "PolymerElements/paper-card#^1.0.0",
-    "vaadin-grid": "^1.0.0"
+    "vaadin-grid": "^1.0.0",
+    "google-youtube": "GoogleWebComponents/google-youtube#^1.1.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
