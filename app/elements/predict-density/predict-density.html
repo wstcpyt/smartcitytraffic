@@ -55,6 +55,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-input value="0" id="snow" error-message="needs some text!" required label="Snow (inches)"></paper-input>
         </div>
       </div>
+      <paper-progress id="loadprogress" value="0" style="display: none"></paper-progress>
       <div class="row">
         <div class="col-md-6">
           <vaadin-grid style="margin-top: 20px;">
@@ -92,6 +93,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       Polymer({
         is: 'predict-density',
         getDensity: function () {
+          this.$$("#loadprogress").style.display="block";
+          this.$$("#loadprogress").value = 10;
           var _this = this;
           var datevalidate = this.$$("#date").validate();
           var hourvalidate = this.$$("#hour").validate();
@@ -100,12 +103,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var hour = this.$$("#hour").value;
             var date = this.$$("#date").value;
             var snow = this.$$("#snow").value;
+            this.$$("#loadprogress").value = 20;
             $.ajax({
                 method: "PUT",
                 data: {hour: hour,date:date,prcp:0,snow:snow,tmax:57,tmin:36},
                 url: "https://traveladvisor.herokuapp.com/densitypredict"
               })
               .done(function (data) {
+                _this.$$("#loadprogress").value = 30;
                 var griddata = [];
                 var topdensityarray = data['top10'];
                 var top10address = data['top10address'];
@@ -126,7 +131,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   marker.push({lat:ltuple[0],lng:ltuple[1],order:index+1})
                 }
                 _this.marker = marker;
+                _this.$$("#loadprogress").value = 70;
                 setTimeout(function () {
+                  _this.$$("#loadprogress").value = 100;
+                  _this.$$("#loadprogress").style.display = "none";
                   _this.$$("google-map").resize()
                 }, 1000); //wait ten seconds before continuing
               });
