@@ -43,32 +43,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </div>
     </div>
-    <div class="modal fade" id="predictdialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Customize your own prediction</h4>
-          </div>
-          <div class="modal-body">
-            <paper-input id="date" error-message="needs some text!" required label="Date: format(2016-04-12)"></paper-input>
-            <paper-input id="hour" error-message="needs some text!" required label="Hour of the day"></paper-input>
-            <paper-input id="prcp" error-message="needs some text!" required label="Precipitation (inches)"></paper-input>
-            <paper-input id="snow" error-message="needs some text!" required label="Snow (inches)"></paper-input>
-            <paper-input id="tmax" error-message="needs some text!" required label="TMAX (F)"></paper-input>
-            <paper-input id="tmin" error-message="needs some text!" required label="TMIN (F)"></paper-input>
-          </div>
-          <div class="modal-footer">
-            <paper-button data-dismiss="modal"  on-click="getDensity" dialog-confirm autofocus>Predict</paper-button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="container">
       <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="visClicked" data-toggle="modal" data-target="#myModal">Visulization</paper-button>
-      <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="openDialog" data-toggle="modal" data-target="#predictdialog" raised>New Predict</paper-button>
+      <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="getDensity" data-toggle="modal" data-target="#predictdialog" raised>New Predict</paper-button>
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+          <paper-input value="2016-04-12" id="date" error-message="needs some text!" required label="Date: format(2016-04-12)"></paper-input>
+          <paper-input value="12" id="hour" error-message="needs some text!" required label="Hour of the day"></paper-input>
+          <paper-input value="0" id="snow" error-message="needs some text!" required label="Snow (inches)"></paper-input>
+        </div>
+      </div>
       <div class="row">
         <div class="col-md-6">
           <vaadin-grid style="margin-top: 20px;">
@@ -109,20 +95,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var _this = this;
           var datevalidate = this.$$("#date").validate();
           var hourvalidate = this.$$("#hour").validate();
-          var prcpv = this.$$("#prcp").validate();
           var snowv = this.$$("#snow").validate();
-          var tmaxv = this.$$("#tmax").validate();
-          var tminv = this.$$("#tmin").validate();
-          if (datevalidate && hourvalidate && prcpv && snowv && tmaxv && tminv) {
+          if (datevalidate && hourvalidate && snowv ) {
             var hour = this.$$("#hour").value;
             var date = this.$$("#date").value;
-            var prcp = this.$$("#prcp").value;
             var snow = this.$$("#snow").value;
-            var tmax = this.$$("#tmax").value;
-            var tmin = this.$$("#tmin").value;
             $.ajax({
                 method: "PUT",
-                data: {hour: hour,date:date,prcp:prcp,snow:snow,tmax:tmax,tmin:tmin},
+                data: {hour: hour,date:date,prcp:0,snow:snow,tmax:57,tmin:36},
                 url: "https://traveladvisor.herokuapp.com/densitypredict"
               })
               .done(function (data) {
@@ -131,13 +111,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var top10address = data['top10address'];
                 for (var i = 0; i < topdensityarray.length; i++) {
                   var latlogstr = topdensityarray[i][1].toString();
-                  griddata.push([top10address[i], parseInt(topdensityarray[i][0]),latlogstr])
+                  if(parseInt(topdensityarray[i][0])>0){
+                    griddata.push([top10address[i], parseInt(topdensityarray[i][0]),latlogstr])
+                  }
                 }
                 _this.griddata = griddata;
                 _this.grid.items = function (params, callback) {
                   callback(griddata.slice(params.index, params.index + params.count));
                 };
                 _this.grid.size = griddata.length;
+                var marker = [];
+                for (var index=0;index<griddata.length;index++){
+                  var ltuple = _this.griddata[index][2].split(",");
+                  marker.push({lat:ltuple[0],lng:ltuple[1],order:index+1})
+                }
+                _this.marker = marker;
+                setTimeout(function () {
+                  _this.$$("google-map").resize()
+                }, 1000); //wait ten seconds before continuing
               });
           }
         },
@@ -148,7 +139,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.grid = this.$$("vaadin-grid");
           $.ajax({
               method: "PUT",
-              data: {hour: 12,date:"2016-04-12",prcp:0.1,snow:0,tmax:57,tmin:36},
+              data: {hour: 12,date:"2016-04-12",prcp:0,snow:0,tmax:57,tmin:36},
               url: "https://traveladvisor.herokuapp.com/densitypredict"
             })
             .done(function (data) {
@@ -175,8 +166,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               }, 1000); //wait ten seconds before continuing
             });
         },
-        visClicked: function () {
-        }
+
       });
     })();
   </script>
