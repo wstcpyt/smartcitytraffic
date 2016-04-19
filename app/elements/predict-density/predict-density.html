@@ -29,13 +29,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div id="densityvis" style="margin-left: auto;margin-right: auto">
               <paper-card>
                 <img style="height: 300px" src="../../images/real_density.png">
-                <p>Real Pickup Density</p>
+                <h4>Real Pickup Density</h4>
               </paper-card>
               <paper-card>
                 <img style="height: 300px" src="../../images/predict_density.png">
-                <p>Predicted Pickup Density</p>
+                <h4>Predicted Pickup Density</h4>
               </paper-card>
-            </div>          </div>
+            </div>
+          </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
@@ -64,50 +65,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </div>
     </div>
-    <div class="modal fade" id="mapdialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" >Map visulization</h4>
-          </div>
-          <google-map style="width: 500px; height: 500px" latitude="40.77" longitude="-73.86" fit-to-markers>
-            <template is="dom-repeat" items="{{marker}}">
-              <google-map-marker latitude="{{item.lat}}" longitude="{{item.lng}}"></google-map-marker>
-            </template>
-          </google-map>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
 
     <div class="container">
       <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="visClicked" data-toggle="modal" data-target="#myModal">Visulization</paper-button>
       <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="openDialog" data-toggle="modal" data-target="#predictdialog" raised>New Predict</paper-button>
-      <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="analyzeClicked" data-toggle="modal" data-target="#mapdialog">Analyze</paper-button>
       <div class="row">
-        <div class="col-md-1">
-        </div>
-        <div class="col-md-10">
-          <vaadin-grid style="margin-top: 20px" selection-mode="multi">
+        <div class="col-md-6">
+          <vaadin-grid style="margin-top: 20px;">
             <table>
               <colgroup>
-                <col>
                 <col>
                 <col>
               </colgroup>
               <thead>
               <tr>
                 <th>Address</th>
-                <th>LatLng</th>
                 <th>Pickup Cnt/Hour</th>
               </tr>
               </thead>
             </table>
           </vaadin-grid>
+        </div>
+        <div class="col-md-6" style="margin-top: 40px">
+          <paper-card>
+            <google-map style="width: 500px; height: 500px" latitude="40.77" longitude="-73.86" fit-to-markers>
+              <template is="dom-repeat" items="{{marker}}">
+                <google-map-marker latitude="{{item.lat}}" longitude="{{item.lng}}" icon="../../images/marker.png">
+                  Rank:{{item.order}}
+                </google-map-marker>
+              </template>
+            </google-map>
+          </paper-card>
         </div>
       </div>
     </div>
@@ -143,9 +131,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var top10address = data['top10address'];
                 for (var i = 0; i < topdensityarray.length; i++) {
                   var latlogstr = topdensityarray[i][1].toString();
-                  griddata.push([top10address[i], latlogstr, parseInt(topdensityarray[i][0])])
+                  griddata.push([top10address[i], parseInt(topdensityarray[i][0]),latlogstr])
                 }
-                _this.griddata = griddata
+                _this.griddata = griddata;
                 _this.grid.items = function (params, callback) {
                   callback(griddata.slice(params.index, params.index + params.count));
                 };
@@ -154,7 +142,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         },
         ready: function () {
-          this.marker = []
+          this.marker = [];
           var _this = this;
           _this.griddata = [];
           this.grid = this.$$("vaadin-grid");
@@ -169,26 +157,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var top10address = data['top10address'];
               for (var i = 0; i < topdensityarray.length; i++) {
                 var latlogstr = topdensityarray[i][1].toString();
-                griddata.push([top10address[i], latlogstr, parseInt(topdensityarray[i][0])])
+                griddata.push([top10address[i], parseInt(topdensityarray[i][0]),latlogstr])
               }
               _this.griddata = griddata;
               _this.grid.items = function (params, callback) {
                 callback(griddata.slice(params.index, params.index + params.count));
               };
               _this.grid.size = 10;
+              var marker = [];
+              for (var index=0;index<10;index++){
+                var ltuple = _this.griddata[index][2].split(",");
+                marker.push({lat:ltuple[0],lng:ltuple[1],order:index+1})
+              }
+              _this.marker = marker;
+              setTimeout(function () {
+                _this.$$("google-map").resize()
+              }, 1000); //wait ten seconds before continuing
             });
-        },
-        analyzeClicked: function () {
-          var _this = this;
-          var marker = [];
-          this.grid.selection.selected(function (index) {
-            var ltuple = _this.griddata[index][1].split(",");
-            marker.push({lat:ltuple[0],lng:ltuple[1]})
-          });
-          _this.marker = marker;
-          setTimeout(function () {
-            _this.$$("google-map").resize()
-          }, 1000); //wait ten seconds before continuing
         },
         visClicked: function () {
         }
