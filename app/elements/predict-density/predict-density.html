@@ -45,20 +45,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
 
     <div class="container">
-      <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="visClicked" data-toggle="modal" data-target="#myModal">Visulization</paper-button>
-      <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="getDensity" data-toggle="modal" data-target="#predictdialog" raised>New Predict</paper-button>
-      <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
-          <paper-input value="2016-04-12" id="date" error-message="needs some text!" required label="Date: format(2016-04-12)"></paper-input>
-          <paper-input value="12" id="hour" error-message="needs some text!" required label="Hour of the day"></paper-input>
-          <paper-input value="0" id="snow" error-message="needs some text!" required label="Snow (inches)"></paper-input>
-        </div>
-      </div>
       <paper-progress id="loadprogress" value="0" style="display: none"></paper-progress>
       <div class="row">
         <div class="col-md-6">
-          <vaadin-grid style="margin-top: 20px;">
+          <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+              <paper-input value="2016-04-12" id="date" error-message="needs some text!" required label="Date: format(2016-04-12)"></paper-input>
+              <paper-input value="12" id="hour" error-message="needs some text!" required label="Hour of the day"></paper-input>
+              <paper-input value="0" id="snow" error-message="needs some text!" required label="Snow (inches)"></paper-input>
+            </div>
+          </div>
+          <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="getDensity" data-toggle="modal" data-target="#predictdialog" raised>New Predict</paper-button>
+          <paper-button style="margin-left: auto;margin-right: auto; display: block; width: 150px; margin-top: 10px; background: #303a9f;color: white" on-click="visClicked" data-toggle="modal" data-target="#myModal">Visulization</paper-button>
+          <vaadin-grid style="margin-top: 10px;" id="maingrid">
             <table>
               <colgroup>
                 <col>
@@ -75,7 +75,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
         <div class="col-md-6" style="margin-top: 40px">
           <paper-card>
-            <google-map style="width: 500px; height: 500px" latitude="40.77" longitude="-73.86" fit-to-markers>
+            <google-map style="width: 500px; height: 500px" latitude="40.77" longitude="-73.86" zoom="11">
               <template is="dom-repeat" items="{{marker}}">
                 <google-map-marker latitude="{{item.lat}}" longitude="{{item.lng}}" icon="../../images/marker.png">
                   Rank:{{item.order}}
@@ -85,6 +85,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </paper-card>
         </div>
       </div>
+      <div class="row">
+        <paper-card>
+
+        </paper-card>
+        <vaadin-grid id="comparegrid" style="display:none">
+          <table>
+            <colgroup>
+              <col>
+              <col>
+              <col>
+            </colgroup>
+            <thead>
+            <tr>
+              <th>Address</th>
+              <th>Normal day</th>
+              <th>Snow day(6 inch)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Madison Square Garden</td>
+              <td>419</td>
+              <td>89 <span style="color: red;">(79% off)</span></td>
+            </tr>
+            <tr>
+              <td>Laguardia Airport</td>
+              <td>177</td>
+              <td>94 <span style="color: red;">(47% off)</span></td>
+            </tr>
+            </tbody>
+          </table>
+        </vaadin-grid>
+      </div>
     </div>
   </template>
   <script>
@@ -93,6 +126,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       Polymer({
         is: 'predict-density',
         getDensity: function () {
+          this.$$("#comparegrid").style.display="block";
           this.$$("#loadprogress").style.display="block";
           this.$$("#loadprogress").value = 10;
           var _this = this;
@@ -114,17 +148,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var griddata = [];
                 var topdensityarray = data['top10'];
                 var top10address = data['top10address'];
-                for (var i = 0; i < topdensityarray.length; i++) {
+                for (var i = 0; i < 5; i++) {
                   var latlogstr = topdensityarray[i][1].toString();
                   if(parseInt(topdensityarray[i][0])>0){
-                    griddata.push([top10address[i], parseInt(topdensityarray[i][0]),latlogstr])
+                     griddata.push([top10address[i], parseInt(topdensityarray[i][0]),latlogstr])
                   }
                 }
                 _this.griddata = griddata;
                 _this.grid.items = function (params, callback) {
                   callback(griddata.slice(params.index, params.index + params.count));
                 };
-                _this.grid.size = griddata.length;
+                _this.grid.size = 5;
                 var marker = [];
                 for (var index=0;index<griddata.length;index++){
                   var ltuple = _this.griddata[index][2].split(",");
@@ -141,10 +175,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         },
         ready: function () {
+          this.lga = 177;
           this.marker = [];
           var _this = this;
           _this.griddata = [];
-          this.grid = this.$$("vaadin-grid");
+          this.grid = this.$$("#maingrid");
           $.ajax({
               method: "PUT",
               data: {hour: 12,date:"2016-04-12",prcp:0,snow:0,tmax:57,tmin:36},
@@ -154,7 +189,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               var griddata = [];
               var topdensityarray = data['top10'];
               var top10address = data['top10address'];
-              for (var i = 0; i < topdensityarray.length; i++) {
+              for (var i = 0; i < 5; i++) {
                 var latlogstr = topdensityarray[i][1].toString();
                 griddata.push([top10address[i], parseInt(topdensityarray[i][0]),latlogstr])
               }
@@ -162,9 +197,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               _this.grid.items = function (params, callback) {
                 callback(griddata.slice(params.index, params.index + params.count));
               };
-              _this.grid.size = 10;
+              _this.grid.size = 5;
               var marker = [];
-              for (var index=0;index<10;index++){
+              for (var index=0;index<5;index++){
                 var ltuple = _this.griddata[index][2].split(",");
                 marker.push({lat:ltuple[0],lng:ltuple[1],order:index+1})
               }
